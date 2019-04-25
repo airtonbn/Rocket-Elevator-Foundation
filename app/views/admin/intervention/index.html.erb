@@ -1,0 +1,201 @@
+	<section class="btn btn-xlg btn-primary fs-20 fullwidth m-0 rad-40 p-40 " style="background-image: url('/assets/AdobeStock_103570025.jpeg');">
+		<span class="font-lato fs-30" style="color:rgb(300, 300, 300)">
+			For the best elevators,
+			<strong> Rocket Elevators ! </strong>
+		</span>
+	</section>
+
+	</footer>
+	<!-- /FOOTER INFO -->
+
+	<!-- FOOTER Formulaire-->
+		<div id="footer" class="wide">
+
+			<div class="row" style="margin:2%">
+			<h2 class="col-sm-6">YOUR INTERVENTION : </h2>
+
+				<!-- FORM -->
+				<div style="margin:0% ; padding:0%" class="col-md-9">
+
+					&nbsp;
+					&nbsp;
+					&nbsp;
+
+					<%# ---------------------- dropdown qui est lien avec la database mysql -------------------- %>
+							<%# 1- do a  form_for or form_with
+							2- <%= f.select(:customer_id, == customer_id for the  customers,
+							3- Customer.all.collect == they collect all customer class, 
+							4- afeter in the class in mysql company_name for have all name of compagny == p.company_name,
+							5- second  p.id show the value to get in building class  == p.id 
+
+					<%# <%= form_with :intervention, url: {},html: {method: "post"} do |f| %>
+					<%= form_with model: @intervention, url: '/admin/intervention/create', local: true  do |f| %> 
+					
+					<%= f.select(:customer_id, Customer.all.collect {|p| [p.company_name, p.id]},  {prompt: "Select a Client"}, {class: 'form-control'}) %>
+										
+					<div id = "building"> 
+					<%= f.select(:building_id, Building.all.collect {|p| [p.id]},  {prompt: "Select a Building Number"}, {class: 'form-control'}) %>
+					</div>
+
+					<div id = "battery"> 
+					<%= f.select(:battery_id, Battery.all.collect {|p| [p.id]},  {prompt: "Select a Battery Number"}, {class: 'form-control'}) %>
+					</div>
+					
+					<div id = "column"> 
+					<%= f.select(:column_id, Column.all.collect {|p| [p.id]},  {prompt: "Select a Column Number"}, {class: 'form-control'}) %>
+					</div>
+					
+					<div id = "elevator"> 
+					<%= f.select(:elevator_id, Elevator.all.collect {|p| [p.id]},  {prompt: "Select a Elevator Number"}, {class: 'form-control'}) %>
+					</div>
+					<%# 
+					<%= f.select(:employee_id, options_from_collection_for_select(Employees.all, 'id', 'full_name'),  {prompt: "Select a Employee"}, {class: 'form-control'}) %>
+
+
+					<%# ---------------------  this is a link for send message  for ZENDESK  ----------------------------------- %>
+					<%# ---------------------  this is a link for send message  for ZENDESK  ----------------------------------- %>
+					<%= f.text_field(:repport, {class: 'form-control', :required => "true", :autocomplete => "off"}) %>
+					<%# <%= f.text_field :report %> 
+					<%# ---------------------  this is a link for send message  for ZENDESK  ----------------------------------- %>
+					<%# ---------------------  this is a link for send message  for ZENDESK  ----------------------------------- %>
+
+					<%# --------------------------------------  SEND BUTTON  -------------------------------------- %>
+
+					<%= f.submit "Send" %>
+					<%# --------------------------------------  SEND BUTTON  -------------------------------------- %>
+
+					<% end %>
+
+					</form>
+			</div>
+		</div>
+
+					<%# --------------------------------------  AJAX  -------------------------------------- %>
+<script>
+
+//building
+$("#building").hide();
+$("#customer_id").change(function(){
+	  var customer = $(this).val();
+	console.log("Customer", customer);
+
+  	if(customer == ''){
+  		$("#building").hide();
+  	}else{
+  		$("#building").show();
+  	}
+  	$.ajax({
+	    url: "/admin/intervention/getbuilding",
+	    method: "GET",  
+	    dataType: "json",
+	    data: {customer: customer},
+	    error: function (xhr, status, error) {
+	      	console.error('AJAX Error: ' + status + error);
+	    },
+	    success: function (response) {
+	      	console.log(response);
+	      	$("#building_id").empty();
+ 
+	      	$("#building_id").append('<option>Select</option>');
+	      	for(var i = 0; i < response.length; i++){
+	      	$("#building_id").append('<option value="' + response[i]["id"] + '">'+ "Building id"+ ' ' + response[i]["id"] + '</option>');
+	      	}
+	    }
+  	});
+});
+//battery
+$("#battery").hide();
+$("#building_id").change(function(){
+	  var building = $(this).val();
+
+		console.log("Building", building);
+
+  	if(building == ''){
+  		$("#battery").hide();
+  	}else{
+  		$("#battery").show();
+  	}
+  	$.ajax({
+	    url: "/admin/intervention/getbattery",
+	    method: "GET",  
+	    dataType: "json",
+	    data: {building: building},
+	    error: function (xhr, status, error) {
+	      	console.error('AJAX Error: ' + status + error);
+	    },
+	    success: function (response) {
+	      	console.log(response);
+	      	$("#battery_id").empty();
+ 
+	      	$("#battery_id").append('<option>Select</option>');
+	      	for(var i = 0; i < response.length; i++){
+	      	$("#battery_id").append('<option value="' + response[i]["id"] + '">'+ "Battery id" + ' ' + response[i]["id"] + '</option>');
+	      	}
+	    }
+  	});
+});
+//column
+$("#column").hide();
+$("#battery_id").change(function(){
+	  var battery = $(this).val();
+
+		console.log("battery", battery);
+
+  	if(battery == ''){
+  		$("#column").hide();
+  	}else{
+  		$("#column").show();
+  	}
+  	$.ajax({
+	    url: "/admin/intervention/getcolumn",
+	    method: "GET",  
+	    dataType: "json",
+	    data: {battery: battery},
+	    error: function (xhr, status, error) {
+	      	console.error('AJAX Error: ' + status + error);
+	    },
+	    success: function (response) {
+	      	console.log(response);
+	      	$("#column_id").empty();
+ 
+	      	$("#column_id").append('<option>Select</option>');
+	      	for(var i = 0; i < response.length; i++){
+	      	$("#column_id").append('<option value="' + response[i]["id"] + '">'+"Column id"+ ' ' +response[i]["id"] + '</option>');
+	      	}
+	    }
+  	});
+});
+//elevator
+$("#elevator").hide();
+$("#column_id").change(function(){
+	  var column = $(this).val();
+
+		console.log("column", column);
+
+  	if(column == ''){
+  		$("#elevator").hide();
+  	}else{
+  		$("#elevator").show();
+  	}
+  	$.ajax({
+	    url: "/admin/intervention/getelevator",
+	    method: "GET",  
+	    dataType: "json",
+	    data: {column: column},
+	    error: function (xhr, status, error) {
+	      	// console.error('AJAX Error: ' + status + error);
+	    },
+	    success: function (response) {
+	      	console.log(response);
+	      	$("#elevator_id").empty();
+ 
+	      	$("#elevator_id").append('<option>Select</option>');
+	      	for(var i = 0; i < response.length; i++){
+	      	$("#elevator_id").append('<option value="' + response[i]["id"] + '">'+"Elevator id"+ ' ' +response[i]["id"] + '</option>');
+	      	}
+	    }
+  	});
+});
+
+
+</script>
