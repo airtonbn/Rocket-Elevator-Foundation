@@ -35,6 +35,8 @@ gem 'capistrano-rails', '~> 1.4', require: false
 gem 'capistrano-bundler', '>= 1.1.0'
 gem 'rvm1-capistrano3', require: false
 gem 'capistrano3-puma'
+# New Relic APM
+gem 'newrelic_rpm'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 5.2.2'

@@ -9,7 +9,7 @@ $client = ZendeskAPI::Client.new do |config|
   #Token: fyStrNnAtUO8HzCDWCzkpCqsZfwwkJBfmyvGdfP3 descr: zendeskRocket
 
   # Basic / Token Authentication
-  config.username = "airtonbn@gmail.com" #zendesk para entrar na pagina
+  config.username = "airtonbn@gmail.com" 
 
   # Choose one of the following depending on your authentication choice   zendeskapi
   config.token = ENV['zendeskRocket']   #rocketzendeskapi

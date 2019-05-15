@@ -5,7 +5,7 @@
 # Defines a single server with a list of roles and multiple properties.
 # You can define all roles on a single server, or split them:
 
-server "34.203.94.126", user: "ubuntu", roles: %w{app db web}
+server "18.144.40.99", user: "ubuntu", roles: %w{app db web}
 # server "example.com", user: "deploy", roles: %w{app web}, other_property: :other_value
 # server "db.example.com", user: "deploy", roles: %w{db}
 
@@ -13,6 +13,7 @@ set :rails_env, "development"
 set :deploy_to, "/home/ubuntu/apps/airton_negromonte"
 set :linked_dirs, %w{tmp/pids tmp/sockets log}
 set :linked_files, %w{config/secrets.yml config/database.yml config/application.yml config/dwh_database.yml}
+set :ssh_options,     { forward_agent: true, user: fetch(:user), keys: %w(~/.ssh/id_rsa.pub) }
 
 # role-based syntax
 # ==================
@@ -22,10 +23,55 @@ set :linked_files, %w{config/secrets.yml config/database.yml config/application.
 # property set. Specify the username and a domain or IP for the server.
 # Don't use `:all`, it's a meta role.
 
-role :app, %w{ubuntu@34.203.94.126}
-role :web, %w{ubuntu@34.203.94.126}
-role :db,  %w{ubuntu@34.203.94.126}
+role :app, %w{ubuntu@18.144.40.99}
+role :web, %w{ubuntu@18.144.40.99}
+role :db,  %w{ubuntu@18.144.40.99}
 
+namespace :puma do
+    desc 'Create Directories for Puma Pids and Socket'
+    task :make_dirs do
+      on roles(:app) do
+        execute "mkdir #{shared_path}/tmp/sockets -p"
+        execute "mkdir #{shared_path}/tmp/pids -p"
+      end
+    end
+  
+    before :start, :make_dirs
+  end
+  
+  namespace :deploy do
+    desc "Make sure local git is in sync with remote."
+    task :check_revision do
+      on roles(:app) do
+        unless `git rev-parse HEAD` == `git rev-parse origin/master`
+          puts "WARNING: HEAD is not the same as origin/master"
+          puts "Run `git push` to sync changes."
+          exit
+        end
+      end
+    end
+  
+    desc 'Initial Deploy'
+    task :initial do
+      on roles(:app) do
+        before 'deploy:restart', 'puma:start'
+        invoke 'deploy'
+      end
+    end
+  
+    desc 'Restart application'
+    task :restart do
+      on roles(:app), in: :sequence, wait: 5 do
+        invoke 'puma:restart'
+      end
+    end
+  
+    before :starting,     :check_revision
+    after  :finishing,    :compile_assets
+    after  :finishing,    :cleanup
+    after  :finishing,    :restart
+  end
+  
 # Configuration
 # =============
 # You can set any configuration variable like in config/deploy.rb

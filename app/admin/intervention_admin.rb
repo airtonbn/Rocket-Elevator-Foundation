@@ -126,6 +126,8 @@ Trestle.admin(:intervention) do
 
       @zendesk = session[:companyname]
 
+      p($client)
+
       ZendeskAPI::Ticket.create!($client,
 
         :subject => "Support from Rocket Elevator", 
